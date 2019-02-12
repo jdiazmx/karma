@@ -21,6 +21,7 @@ sudo apt install tor python3 python3-pip
 + python libraries:
     - requests
     - docopt
+    - pysocks
 
 
 To install the necessary libraries, run:
