@@ -6,15 +6,17 @@ author  = 'decoxviii'
 
 usage = """Karma
 Usage:
-    karma.py target <target> [-o <filename>]
-    karma.py search <target> (--password | --local-part | --domain) [-o <filename>]
+    karma.py target <target> [-o FILENAME] [--proxy=<proxy>]
+    karma.py search <target> (--password | --local-part | --domain) 
+                             [-o FILENAME] [--proxy=<proxy>]
     karma.py (-h | --help)
     karma.py --version
 
 Options:
-    -o --output     Save output in json format.
-    -h --help       Show this screen.
-    --version       Show version.
+    -o --output         Save output in json format.
+    --proxy=<proxy>     Set Tor proxy [default: 127.0.0.1:9050].
+    -h --help           Show this screen.
+    --version           Show version.
 """
 
 import sys
@@ -56,7 +58,7 @@ def main():
 
     if args['--output']:
         output = json.dumps(result, indent=2)
-        filename = args['<filename>']
+        filename = args['FILENAME']
         filename = filename if filename else '%s' % time.strftime('%d%m%y-%H%M%S')
         f = open('%s.json' % filename, 'w')
         f.write(output)

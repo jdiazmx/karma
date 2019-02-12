@@ -17,11 +17,15 @@ class pwndb(object):
             'domainopr' : 0,
             'submitform': 'em'
         }
+        
+        proxy = self.args['--proxy']
+        if '//' in proxy:
+            proxy = proxy.split('//')[1]
 
         self.session = requests.session()
         self.session.proxies = {
-            'http' : 'socks5h://127.0.0.1:9050',
-            'https': 'socks5h://127.0.0.1:9050'
+            'http' : 'socks5h://%s' % proxy,
+            'https': 'socks5h://%s' % proxy
         }
 
     def response_parser(self, response):
