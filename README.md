@@ -12,28 +12,22 @@ To run this program it's necessary to have installed:
 + tor
 + python3
 + pyhton-pip3
-
-To install the necessary packages (Debian/Ubuntu), run:
-```
-sudo apt install tor python3 python3-pip
-```
-
 + python libraries:
     - requests
     - docopt
     - pysocks
 
-
+To install the necessary packages (Debian/Ubuntu), run:
+```
+sudo apt install tor python3 python3-pip
+```
+### Clone this repository
+```
+git clone https://github.com/decoxviii/karma.git ; cd karma
+```
 To install the necessary libraries, run:
 ```
 pip3 install -r requirements.txt
-```
-
-### Installing
-Once the prerequisites are installed, it is only necessary to clone this repository.
-
-```
-git clone https://github.com/decoxviii/karma.git ; cd karma
 python3 bin/karma.py --help
 ```
 
