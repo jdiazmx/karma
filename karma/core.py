@@ -5,6 +5,9 @@ import re
 import sys
 import os
 
+# Colors
+GREEN, RESET = '\033[92m', '\033[0m'
+
 class pwndb(object):
 
     """Docstring for pwndb. """
@@ -31,6 +34,8 @@ class pwndb(object):
     def response_parser(self, response):
         """ Parse pwndb response """
 
+        print(":{} Analyzing response{}".format(GREEN, RESET), end='\r')
+
         resp = re.findall(r'\[(.*)', response)
         resp = [ resp[n:n+4] for n in range(0, len(resp), 4) ]
         results = {}
@@ -55,6 +60,8 @@ class pwndb(object):
     def email_request(self, email):
         """ Request with email """
 
+        print(":{} Request email{}".format(GREEN, RESET), end='\r')
+
         self.data['luser']  = email.split('@')[0]
         self.data['domain'] = email.split('@')[1]
         try:
@@ -69,6 +76,8 @@ class pwndb(object):
     def search_localpart(self, target):
         """ Request with localpart """
 
+        print(":{} Request local-part{}".format(GREEN, RESET), end='\r')
+
         self.data['luseropr'] = 1
         self.data['luser'] = target
 
@@ -82,6 +91,8 @@ class pwndb(object):
 
     def search_password(self, target):
         """ Requests with password """
+
+        print(":{} Request password{}".format(GREEN, RESET), end='\r')
         
         self.data['submitform'] = 'pw'
         self.data['password'] = target
@@ -96,6 +107,8 @@ class pwndb(object):
 
     def search_domain(self, target):
         """ Requests with domain """
+
+        print(":{} Request domain{}".format(GREEN, RESET), end='\r')
 
         self.data['domainopr'] = 1
         self.data['domain'] = target

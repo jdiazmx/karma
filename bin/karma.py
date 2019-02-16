@@ -40,12 +40,12 @@ def main():
     pwndb = core.pwndb(args)
     banner.print_banner(project, version, author)   # print banner
     
-    print(': Searching\n')
+    print(': Searching')
     # get search results
     result = pwndb.search_info()
     
     if not result:
-        print(': 0 Results found.')
+        print('\n: 0 Results found.')
         sys.exit()
     
     # print results
