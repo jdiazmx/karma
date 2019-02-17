@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 project = 'Karma'
-version = '10.02.19'
+version = '17.02.19'
 author  = 'decoxviii'
 
 usage = """Karma
@@ -33,9 +33,10 @@ try:
 except Exception as e:
     print("Error:", e )
     print("Please install the requirements:\n\t$ pip3 install -r requirements.txt")
-    sys.exit(-1)
+    sys.exit(1)
 
 def main():
+    start = time.time()
     args  = docopt(usage, version=version)          # load args
     pwndb = core.pwndb(args)
     banner.print_banner(project, version, author)   # print banner
@@ -45,7 +46,8 @@ def main():
     result = pwndb.search_info()
     
     if not result:
-        print('\n: 0 Results found.')
+        end = time.time() - start
+        print('\n: 0 Results found in {:.2f} segs.'.format(end ))
         sys.exit()
     
     # print results
@@ -54,7 +56,8 @@ def main():
             result[key]['email'], 
             result[key]['passw']))
     
-    print('\n: %s Results found.' % len(result.keys()))
+    end = time.time() - start
+    print('\n: {} Results found in {:.2f} segs.'.format( len(result.keys()), end ))
 
     if args['--output']:
         output = json.dumps(result, indent=2)

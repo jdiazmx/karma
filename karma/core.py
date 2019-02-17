@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
 import requests
-import re
 import sys
+import re
 import os
 
 # Colors
-GREEN, RESET = '\033[92m', '\033[0m'
+GREEN, RED, RESET = '\033[92m', '\033[91m', '\033[0m'
+
 
 class pwndb(object):
 
@@ -31,10 +32,23 @@ class pwndb(object):
             'https': 'socks5h://%s' % proxy
         }
 
+
+
+    def get_requests(self, data):
+        
+        try:
+            req = self.session.post(self.domain, data=data)
+        except Exception as e:
+            print('{}E:{}{}'.format(RED, e, RESET))
+            sys.exit(2)
+        
+        return req.text
+
+
     def response_parser(self, response):
         """ Parse pwndb response """
 
-        print(":{} Analyzing response{}".format(GREEN, RESET), end='\r')
+        print(":{} Analyzing response{}".format(GREEN, RESET))
 
         resp = re.findall(r'\[(.*)', response)
         resp = [ resp[n:n+4] for n in range(0, len(resp), 4) ]
@@ -56,97 +70,91 @@ class pwndb(object):
         if re.match(regex, email):
             return True
 
+        print(':{} Invalid email: {}{}'.format(RED, email, RESET))
+        
+
         
     def email_request(self, email):
         """ Request with email """
 
-        print(":{} Request email{}".format(GREEN, RESET), end='\r')
+        print(":{} Request email: {}{}".format(GREEN, email, RESET))
 
         self.data['luser']  = email.split('@')[0]
         self.data['domain'] = email.split('@')[1]
-        try:
-            req = self.session.post(self.domain, data=self.data)
-        except Exception as e:
-            print('Error:', e)
-            sys.exit(1)
 
-        return req.text
+        return self.get_requests(self.data)
 
 
     def search_localpart(self, target):
         """ Request with localpart """
 
-        print(":{} Request local-part{}".format(GREEN, RESET), end='\r')
+        print(":{} Request local-part: {}{}".format(GREEN, target, RESET))
 
         self.data['luseropr'] = 1
         self.data['luser'] = target
 
-        try:
-            req = self.session.post(self.domain, data=self.data)
-        except Exception as e:
-            print('Error:', e)
-            sys.exit(1)
+        return self.get_requests(self.data)
 
-        return req.text
 
     def search_password(self, target):
         """ Requests with password """
 
-        print(":{} Request password{}".format(GREEN, RESET), end='\r')
+        print(":{} Request password: {}{}".format(GREEN, target, RESET))
         
         self.data['submitform'] = 'pw'
         self.data['password'] = target
 
-        try:
-            req = self.session.post(self.domain, data=self.data)
-        except Exception as e:
-            print('Error:', e)
-            sys.exit(1)
+        return self.get_requests(self.data)
 
-        return req.text
 
     def search_domain(self, target):
         """ Requests with domain """
 
-        print(":{} Request domain{}".format(GREEN, RESET), end='\r')
+        print(":{} Request domain: {}{}".format(GREEN, target, RESET))
 
         self.data['domainopr'] = 1
         self.data['domain'] = target
 
-        try:
-            req = self.session.post(self.domain, data=self.data)
-        except Exception as e:
-            print('Error:', e)
-            sys.exit(1)
+        return self.get_requests(self.data)
 
-        return req.text
+
+    def choose_function(self, target):
+        """
+        Choose the corresponding function 
+        according to the parameter
+        """
+
+        opts = {
+            '--local-part': self.search_localpart,
+            '--password'  : self.search_password,
+            '--domain'    : self.search_domain
+        }
+            
+        for key, value in self.args.items():
+            if value and key in opts:
+                return opts[key](target)
+
 
     def search_info(self):
+        """Start the information search"""
+
+        opt_search = self.args['search']
+        opt_target = self.args['target']
         
-        search = self.args['search']
         target = self.args['<target>']
+        if os.path.exists(target):
+            lines = open(target, 'r').readlines()
+            response = ''
+            
+            for item in lines:
+                item = item.strip('\n')
+                response += self.choose_function(item) if opt_search else None
 
-        if search:
-            opts = {
-                '--local-part': self.search_localpart,
-                '--password'  : self.search_password,
-                '--domain'    : self.search_domain}
-
-            for key, value in self.args.items():
-                if value and key in opts:
-                   response = opts[key](target)
-                   return self.response_parser(response)
+                if opt_target and self.check_email(item):
+                    response += self.email_request(item)
+                        
+            return self.response_parser(response)
 
         if self.check_email(target):
             response = self.email_request(target)
             return self.response_parser(response)
-        
-        if os.path.exists(target):
-            emails = open(target, 'r').readlines()
-            response = ''
-            for email in emails:
-                email = email.strip('\n')
-                if self.check_email(email):
-                    response += self.email_request(email)
-            return self.response_parser(response)
-
