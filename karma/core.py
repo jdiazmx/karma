@@ -154,7 +154,11 @@ class pwndb(object):
                     response += self.email_request(item)
                         
             return self.response_parser(response)
+        
+        if opt_search:
+            response = self.choose_function(target)
 
-        if self.check_email(target):
+        elif self.check_email(target):
             response = self.email_request(target)
-            return self.response_parser(response)
+        
+        return self.response_parser(response)
