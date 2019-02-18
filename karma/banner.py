@@ -21,7 +21,7 @@ def print_banner(name='Nameless', version='00.00.00', author='unknown'):
     name = ' '.join(name.upper())   # space between letters
 
     # ? ? N A M E ? ?
-    name = '{} \033[1m{} \033[0m{}'.format(char(2), name, char(2))
+    name = '{} \033[1;92m{} \033[0m{}'.format(char(2), name, char(2))
 
     lines = [char(nlen), name, char(nlen)]
     print(':\n')
