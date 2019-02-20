@@ -141,18 +141,24 @@ class pwndb(object):
         opt_search = self.args['search']
         opt_target = self.args['target']
         
+        response = ''
         target = self.args['<target>']
+
         if os.path.exists(target):
             lines = open(target, 'r').readlines()
-            response = ''
-            
             for item in lines:
                 item = item.strip('\n')
-                response += self.choose_function(item) if opt_search else None
+                
+                try:
+                    if opt_search:
+                        response += self.choose_function(item)
 
-                if opt_target and self.check_email(item):
-                    response += self.email_request(item)
-                        
+                    if opt_target and self.check_email(item):
+                        response += self.email_request(item)
+                except KeyboardInterrupt:
+                    print('\n: break')
+                    break
+                
             return self.response_parser(response)
         
         if opt_search:
