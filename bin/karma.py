@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 project = 'Karma'
-version = '17.02.19'
+version = '20.02.19'
 author  = 'decoxviii'
 
 usage = """Karma
@@ -50,9 +50,8 @@ def main():
     
     if not result:
         end = time.time() - start
-        print(':{} Results:{}\n'.format(GREEN, RESET))
-        print('- None | None')
-        print('\n:{} 0 Results found in {:.2f} segs.{}'.format(
+        print(':{} Results:{}'.format(GREEN, RESET))
+        print(':{} 0 Results found in {:.2f} segs.{}'.format(
             GREEN, end, RESET ))
         sys.exit()
     

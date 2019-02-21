@@ -34,7 +34,8 @@ class pwndb(object):
 
 
 
-    def get_requests(self, data):
+    def get_request(self, data):
+        """ Get requests """
         
         try:
             req = self.session.post(self.domain, data=data)
@@ -50,6 +51,9 @@ class pwndb(object):
 
         print("\n:{} Analyzing response{}".format(GREEN, RESET))
 
+        if not response:
+            return ''
+
         resp = re.findall(r'\[(.*)', response)
         resp = [ resp[n:n+4] for n in range(0, len(resp), 4) ]
         results = {}
@@ -62,60 +66,64 @@ class pwndb(object):
 
         return results
     
-    
-    def check_email(self, email):
-        """ Verify that the email is valid """
-
-        regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
-        if re.match(regex, email):
-            return True
-
-        print(':{} Invalid email: {}{}\033[J'.format(RED, email, RESET))
-        
-
-        
-    def email_request(self, email):
+       
+    def email_request(self, target):
         """ Request with email """
-        print(':{} Request email: {}{}\033[J'.format(GREEN, email, RESET), end='\r')
+        
+        regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
+        if re.match(regex, target):
+            print(':{} Request email: {}{}\033[J'.format(GREEN, target, RESET), end='\r')
 
+            self.data['luser']  = target.split('@')[0]
+            self.data['domain'] = target.split('@')[1]
 
-        self.data['luser']  = email.split('@')[0]
-        self.data['domain'] = email.split('@')[1]
+            return self.get_request(self.data)
+        
+        print(':{} Invalid email: {}{}\033[J'.format(RED, target, RESET))
+        return ""
 
-        return self.get_requests(self.data)
-
-
+    
     def search_localpart(self, target):
         """ Request with localpart """
 
-        print(":{} Request local-part: {}{}".format(GREEN, target, RESET))
+        regex = r"(^[a-zA-Z0-9_.+%-]+$)"
+        if re.match(regex, target):
+            print(':{} Request local-part: {}{}\033[J'.format(GREEN, target, RESET), end='\r')
 
-        self.data['luseropr'] = 1
-        self.data['luser'] = target
+            self.data['luseropr'] = 1
+            self.data['luser'] = target
 
-        return self.get_requests(self.data)
+            return self.get_request(self.data)
 
-
-    def search_password(self, target):
-        """ Requests with password """
-
-        print(":{} Request password: {}{}".format(GREEN, target, RESET))
-        
-        self.data['submitform'] = 'pw'
-        self.data['password'] = target
-
-        return self.get_requests(self.data)
+        print(':{} Invalid local-part: {}{}\033[J'.format(RED, target, RESET))
+        return ""
 
 
     def search_domain(self, target):
         """ Requests with domain """
 
-        print(":{} Request domain: {}{}".format(GREEN, target, RESET))
+        regex = r"(^[a-zA-Z0-9-%]+\.[a-zA-Z0-9-.%]+$)"
+        if re.match(regex, target):
+            print(':{} Request domain: {}{}\033[J'.format(GREEN, target, RESET), end='\r')
 
-        self.data['domainopr'] = 1
-        self.data['domain'] = target
+            self.data['domainopr'] = 1
+            self.data['domain'] = target
 
-        return self.get_requests(self.data)
+            return self.get_request(self.data)
+
+        print(':{} Invalid domain: {}{}\033[J'.format(RED, target, RESET))
+        return ""
+
+
+    def search_password(self, target):
+        """ Requests with password """
+        
+        print(':{} Request password: {}{}\033[J'.format(GREEN, target, RESET), end='\r')
+            
+        self.data['submitform'] = 'pw'
+        self.data['password'] = target
+
+        return self.get_request(self.data)
 
 
     def choose_function(self, target):
@@ -153,8 +161,9 @@ class pwndb(object):
                     if opt_search:
                         response += self.choose_function(item)
 
-                    elif opt_target and self.check_email(item):
+                    if opt_target:
                         response += self.email_request(item)
+
                 except KeyboardInterrupt:
                     print('\n:{} break{}'.format(RED, RESET))
                     break
@@ -164,7 +173,7 @@ class pwndb(object):
         if opt_search:
             response = self.choose_function(target)
 
-        elif self.check_email(target):
+        if opt_target and target:
             response = self.email_request(target)
         
         return self.response_parser(response)
