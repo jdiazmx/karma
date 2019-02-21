@@ -48,7 +48,7 @@ class pwndb(object):
     def response_parser(self, response):
         """ Parse pwndb response """
 
-        print(":{} Analyzing response{}\n".format(GREEN, RESET))
+        print("\n:{} Analyzing response{}".format(GREEN, RESET))
 
         resp = re.findall(r'\[(.*)', response)
         resp = [ resp[n:n+4] for n in range(0, len(resp), 4) ]
@@ -70,14 +70,14 @@ class pwndb(object):
         if re.match(regex, email):
             return True
 
-        print(':{} Invalid email: {}{}'.format(RED, email, RESET))
+        print(':{} Invalid email: {}{}\033[J'.format(RED, email, RESET))
         
 
         
     def email_request(self, email):
         """ Request with email """
+        print(':{} Request email: {}{}\033[J'.format(GREEN, email, RESET), end='\r')
 
-        print(":{} Request email: {}{}".format(GREEN, email, RESET))
 
         self.data['luser']  = email.split('@')[0]
         self.data['domain'] = email.split('@')[1]
@@ -153,10 +153,10 @@ class pwndb(object):
                     if opt_search:
                         response += self.choose_function(item)
 
-                    if opt_target and self.check_email(item):
+                    elif opt_target and self.check_email(item):
                         response += self.email_request(item)
                 except KeyboardInterrupt:
-                    print('\n: break')
+                    print('\n:{} break{}'.format(RED, RESET))
                     break
                 
             return self.response_parser(response)

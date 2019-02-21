@@ -26,7 +26,7 @@ import time
 import sys
 
 # Colors
-GREEN, RESET = '\033[92m', '\033[0m'
+RESET, GREEN = '\033[0m', '\033[92m'
 
 try:
     sys.path.insert(0, path.abspath(path.join(path.dirname(__file__), '..')))
@@ -50,10 +50,14 @@ def main():
     
     if not result:
         end = time.time() - start
-        print('\n: 0 Results found in {:.2f} segs.'.format(end ))
+        print(':{} Results:{}\n'.format(GREEN, RESET))
+        print('- None | None')
+        print('\n:{} 0 Results found in {:.2f} segs.{}'.format(
+            GREEN, end, RESET ))
         sys.exit()
     
     # print results
+    print(':{} Results:{}\n'.format(GREEN, RESET))
     length = [result[key]['email'] for key in result.keys()]
     length = len(max(length, key=len))
 
