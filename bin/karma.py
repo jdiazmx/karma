@@ -19,15 +19,18 @@ Options:
     --version           Show version.
 """
 
-import sys
-import json
-import time
 from os import path
 
+import json
+import time
+import sys
+
+# Colors
+GREEN, RESET = '\033[92m', '\033[0m'
+
 try:
-    from docopt import docopt
-    
     sys.path.insert(0, path.abspath(path.join(path.dirname(__file__), '..')))
+    from docopt import docopt
     from karma import banner
     from karma import core
 except Exception as e:
@@ -41,7 +44,7 @@ def main():
     pwndb = core.pwndb(args)
     banner.print_banner(project, version, author)   # print banner
     
-    print(': Searching')
+    print(':{} Searching{}'.format(GREEN, RESET))
     # get search results
     result = pwndb.search_info()
     
@@ -51,13 +54,18 @@ def main():
         sys.exit()
     
     # print results
+    length = [result[key]['email'] for key in result.keys()]
+    length = len(max(length, key=len))
+
     for key in result.keys():
-        print('- {} : {}'.format(
-            result[key]['email'], 
-            result[key]['passw']))
+        print('- {} | {}'.format(
+            result[key]['email'].ljust(length),
+            result[key]['passw']
+        ))
     
     end = time.time() - start
-    print('\n: {} Results found in {:.2f} segs.'.format( len(result.keys()), end ))
+    print('\n: {}{} Results found in {:.2f} segs.{}'.format(
+        GREEN, len(result.keys()), end, RESET ))
 
     if args['--output']:
         output = json.dumps(result, indent=2)

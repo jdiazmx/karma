@@ -48,7 +48,7 @@ class pwndb(object):
     def response_parser(self, response):
         """ Parse pwndb response """
 
-        print(":{} Analyzing response{}".format(GREEN, RESET))
+        print(":{} Analyzing response{}\n".format(GREEN, RESET))
 
         resp = re.findall(r'\[(.*)', response)
         resp = [ resp[n:n+4] for n in range(0, len(resp), 4) ]
