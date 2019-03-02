@@ -9,7 +9,7 @@ Karma is a tool written in [python3](https://www.python.org) for the search of e
 ```
 sudo apt install tor python3 python3-pip
 git clone https://github.com/decoxviii/karma.git ; cd karma
-pip3 install -r requirements.txt
+sudo -H pip3 install -r requirements.txt
 python3 bin/karma.py --help
 ```
 
